@@ -1,9 +1,0 @@
-import "hashes/sha256/512bitPacked.code" as sha256
-
-// we prove that I know the opening of a hash function
-
-def main(private field a, private field b, private field c, private field d) -> (field[2]):
-    h = sha256([a, b, c, d])
-    return h
-
-
