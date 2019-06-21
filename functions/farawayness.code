@@ -7,4 +7,4 @@ def main(field d, private field a, private field b) -> (field):
     for field i in 0..127 do
       cd = cd + if va[i] == vb[i] then 0 else 1 fi 
     endfor
-    return if cd < d then 1 else 0 fi
+    return if cd > d then 1 else 0 fi

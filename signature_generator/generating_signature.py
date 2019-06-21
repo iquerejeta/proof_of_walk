@@ -8,6 +8,8 @@ import time
 
 from zokrates.eddsa import PrivateKey, PublicKey
 from zokrates.field import FQ
+
+from petlib.bn import Bn
 # from zokrates.utils import write_signature_for_zokrates_cli
 
 
@@ -23,7 +25,7 @@ def write_signature_for_zokrates_cli(pk, sig, path, coordenadas):
             file.write(l)
 
 
-def write_double_sig(pk, sig_1, sig_2, coordinates_1, timestamp_1, coordinates_2, timestamp_2, distance, current_time, time_distance, path='./powha_args'):
+def write_double_sig(pk, sig_1, sig_2, coordinates_1, timestamp_1, coordinates_2, timestamp_2, distance, current_time, time_distance, path):
     args = [coordinates_1, timestamp_1, coordinates_2, timestamp_2]
     sig_R_1, sig_S_1 = sig_1
     sig_R_2, sig_S_2 = sig_2
@@ -46,7 +48,7 @@ def telecom_signature(coordinates, write_sig_zokrates=False):
     Hardcoded values. Just trust me.
 
     Example:
-        >>> pk, sig, msg, ts = telecom_signature(2189963759073207093083509)
+        >>> pk, sig, msg, ts, _ = telecom_signature(5)
         >>> pk.verify(sig, msg)
         True
         >>> msg_fake = hashlib.sha256("234".encode("utf-8")).digest()
@@ -65,7 +67,14 @@ def telecom_signature(coordinates, write_sig_zokrates=False):
     pre_image = "0" * 256 + pre_image_ts + pre_image_coords # working with pre_image_coords = "0" * (512 - len(pre_image_coords)) + pre_image
     # pre_image = "0" * (512 - len(pre_image_coords)) + pre_image_coords
     pre_image_bytes = BitArray(bin=pre_image).bytes
-    msg_bytes = hashlib.sha256(pre_image_bytes).digest() + b"\0" * 32
+    msg_bytes_short = hashlib.sha256(pre_image_bytes).digest()
+    msg_bytes = msg_bytes_short + b"\0" * 32
+
+    # args = " ".join(map(str, [timestamp, coordinates, Bn.from_hex(msg_bytes_short[:16].hex()), Bn.from_hex(msg_bytes_short[16:].hex())])) + "\n\n"
+    #
+    # with open("./computed_signatures", "a+") as file:
+    #     for write_in in args:
+    #         file.write(write_in)
 
     assert (len(msg_bytes) == 64)
 
@@ -78,29 +87,34 @@ def telecom_signature(coordinates, write_sig_zokrates=False):
         path = './zokrates_args'
         write_signature_for_zokrates_cli(pk, sig, path, coordinates)
 
-    return pk, sig, msg_bytes, timestamp
+    hash_pair = Bn.from_hex(msg_bytes_short[:16].hex()), Bn.from_hex(msg_bytes_short[16:].hex())
+
+    return pk, sig, msg_bytes, timestamp, hash_pair
 
 
-def multiple_sig(coord_1, coord_2, distance=15, time_distance=300):
+def multiple_sig(coord_1, coord_2, distance=15, time_distance=300, path='./powha_args', time_walks=10):
     """
     Generate multiple signature
 
     Example:
-        >>> multiple_sig(2189963759064380391430512, 2189963759064397451712689)
+        >>> _, _ = multiple_sig(2189963759064380391430512, 2189963759064397451712689)
     """
     sig_1 = telecom_signature(coord_1)
-    time.sleep(10)
+    time.sleep(time_walks)
     sig_2 = telecom_signature(coord_2)
 
     assert(sig_1[0] == sig_2[0])
 
     timestamp_1 = sig_1[3]
     timestamp_2 = sig_2[3]
-    time.sleep(10)
+    hash_pair_1 = sig_1[4]
+    hash_pair_2 = sig_2[4]
+    time.sleep(time_walks)
     current_time = int(dt.datetime.now().timestamp())
 
-    write_double_sig(sig_1[0], sig_1[1], sig_2[1], coord_1, timestamp_1, coord_2, timestamp_2, distance, current_time, time_distance)
+    write_double_sig(sig_1[0], sig_1[1], sig_2[1], coord_1, timestamp_1, coord_2, timestamp_2, distance, current_time, time_distance, path)
 
+    return [timestamp_1, timestamp_2], [hash_pair_1, hash_pair_2]
 
 if __name__ == '__main__':
     import doctest

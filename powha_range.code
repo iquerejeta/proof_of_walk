@@ -1,10 +1,6 @@
-import "hashes/sha256/512bitPacked.code" as sha256packed
-import "signatures/verifyEddsa.code" as verify_sig
-import "ecc/babyjubjubParams.code" as ec_params
-import "utils/pack/unpack128.code" as unpack
 import "./functions/location_integrity.code" as location_integrity
 import "./functions/time_closeness.code" as time_closeness
-import "./functions/closeness.code" as closeness
+import "./functions/farawayness.code" as farawayness
 
 // I prove that I have three pair of points with hamming distance greater than x, and 
 // between each of these three pairs there is a distance smaller than y. 
@@ -15,5 +11,5 @@ def main(private field loc_one, private field timestamp_1, private field loc_two
 
 	time_closeness(timestamp_1, current_time, time_distance) == 1
 	time_closeness(timestamp_2, current_time, time_distance) == 1
-	closeness(location_distance, loc_one, loc_two) == 1
+	farawayness(location_distance, loc_one, loc_two) == 1
 	return 1

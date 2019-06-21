@@ -1,3 +1,8 @@
+import "hashes/sha256/512bitPacked.code" as sha256packed
+import "signatures/verifyEddsa.code" as verify_sig
+import "ecc/babyjubjubParams.code" as ec_params
+import "utils/pack/unpack128.code" as unpack
+
 def main(private field a, private field b, private field c, private field d, private field[2] R, private field S, field[2] A) -> (field):
   // a is the location
 	// b is the timestamp

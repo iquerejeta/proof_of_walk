@@ -26,21 +26,4 @@ pip install -r requirements.txt
 
 End-to-end example
 
-python3 generating_signature.py
-
-you will get as an output powha_args
-
-### remember to stay in the same directory ###
-
-zokrates compile -i /path/to/powha_verification.com
-
-#check output == 1
-cat path/to/powha_args | zokrates compute-witness
-
-zokrates setup
-
-#this generates solidity smart contract to verify the proofs
-zokrates export-verifier
-
-#here you can estimate the prover time
-time zokrates compute-proof
+./generate_powha.sh

@@ -3,26 +3,40 @@
 
 import "./powha_range.code"
 import "./functions/closeness.code" as closeness
+import "./functions/location_integrity.code" as location_integrity
+import "./functions/time_closeness.code" as time_closeness
+import "./functions/closeness.code" as closeness
+import "./functions/farawayness.code" as farawayness
+
+import "hashes/sha256/512bitPacked.code" as sha256packed
 
 // This script will be used to proof the third proof of movement. This will make a normal proof of movement of the new 
 // locations, and then it will proof knowledge of openings of two existing proofs. Finally it will prove that the points used
 // in the three different proofs are smaller than a given range.
 
 // proof of walk
-def main(field hash_proof_1, field hash_proof_2, private field loc_one, private field timestamp_1, private field loc_two, private field timestamp_2, private field[2] R_1, private field S_1, private field[2] R_2, private field S_2, field[2] A, field location_distance, field time_distance, field current_time, field max_distance_paths, private field loc_one_first_proof, private field timestamp_1_first_proof, private field loc_two_first_proof, private field timestamp_2_first_proof, private field loc_one_second_proof, private field timestamp_1_second_proof, private field loc_two_second_proof, private field timestamp_2_second_proof) -> (field):
+def main(field[2] hash_proof_1, field[2] hash_proof_2, private field loc_one, private field timestamp_1, private field loc_two, private field timestamp_2, private field[2] R_1, private field S_1, private field[2] R_2, private field S_2, field[2] A, field location_distance, field time_distance, field current_time, field max_distance_paths, private field loc_one_first_proof, private field timestamp_1_first_proof, private field loc_one_second_proof, private field timestamp_1_second_proof, field max_timedistance_paths) -> (field):
 
-    hash_proof_1 == sha256packed([loc_one_first_proof, timestamp_1_first_proof, loc_two_first_proof, timestamp_2_first_proof])
-    hash_proof_2 == sha256packed([loc_one_second_proof, timestamp_1_second_proof, loc_two_second_proof, timestamp_2_second_proof])
+    hash_proof_pkd_1 = sha256packed([0, 0, timestamp_1_first_proof, loc_one_first_proof])
+    hash_proof_pkd_2 = sha256packed([0, 0, timestamp_1_second_proof, loc_one_second_proof])
+    hash_proof_pkd_1[0] == hash_proof_1[0]
+    hash_proof_pkd_1[1] == hash_proof_1[1]
+    hash_proof_pkd_2[0] == hash_proof_2[0]
+    hash_proof_pkd_2[1] == hash_proof_2[1] 
 
     location_integrity(0, 0, timestamp_1, loc_one, R_1, S_1, A) == 1
 	location_integrity(0, 0, timestamp_2, loc_two, R_2, S_2, A) == 1
 
 	time_closeness(timestamp_1, current_time, time_distance) == 1
 	time_closeness(timestamp_2, current_time, time_distance) == 1
-	closeness(location_distance, loc_one, loc_two) == 1
+	farawayness(location_distance, loc_one, loc_two) == 1
 
     // Now we prove that the point of location one vs location two vs location three are not too far out
+    // and that time one, two and three are no too separated in time
+
     closeness(max_distance_paths, loc_one_first_proof, loc_one_second_proof) == 1
     closeness(max_distance_paths, loc_one_first_proof, loc_one) == 1
+    time_closeness(timestamp_1, timestamp_1_first_proof, max_timedistance_paths) == 1
+    time_closeness(timestamp_1, timestamp_1_second_proof, max_timedistance_paths) == 1
 
 	return 1
