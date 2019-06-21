@@ -1,57 +1,6 @@
 # Copyright 2019
 # Antonio Nappa - Iñigo Querejeta Azurmendi 
 
-import "hashes/sha256/512bitPacked.code" as sha256packed
-import "signatures/verifyEddsa.code" as verify_sig
-import "ecc/babyjubjubParams.code" as ec_params
-import "utils/pack/unpack128.code" as unpack
-
-// I prove that I have three pair of points with hamming distance greater than x, and
-// between each of these three pairs there is a distance smaller than y.
-
-def location_integrity(private field a, private field b, private field c, private field d, private field[2] R, private field S, field[2] A) -> (field):
-  // a is the location
-	// b is the timestamp
-
-	h = sha256packed([a, b, c, d])
-
-	field [128] M1 = unpack(h[0])
-	field [128] M2 = unpack(h[1])
-	field [256] concat = [...M1,...M2]
-	field [256] trailing = [0; 256]
-	context = ec_params()
-
-	return if verify_sig(R, S, A, concat, trailing, context) == 1 then 1 else 0 fi
-
-def time_closeness(private field time, field current_time, field time_threshold) -> (field):
-	return if time_threshold + time > current_time then 1 else 0 fi
-
-def closeness(field d, private field a, private field b) -> (field):
-    field[128] va = unpack(a)
-    field[128] vb = unpack(b)
-    field cd = 0
-    for field i in 0..127 do
-      cd = cd + if va[i] == vb[i] then 0 else 1 fi
-    endfor
-    return if cd < d then 1 else 0 fi
-
-def main(private field loc_one, private field timestamp_1, private field loc_two, private field timestamp_2, private field[2] R_1, private field S_1, private field[2] R_2, private field S_2, field[2] A, field location_distance, field time_distance, field current_time) -> (field):
-	location_integrity(0, 0, timestamp_1, loc_one, R_1, S_1, A) == 1
-	location_integrity(0, 0, timestamp_2, loc_two, R_2, S_2, A) == 1
-
-	time_closeness(timestamp_1, current_time, time_distance) == 1
-	time_closeness(timestamp_2, current_time, time_distance) == 1
-	closeness(location_distance, loc_one, loc_two) == 1
-	return 1
-
-
-Collapse
-
-
-
-
-9:21 PM
-Untitled 
 import hashlib
 import datetime as dt
 from bitstring import BitArray

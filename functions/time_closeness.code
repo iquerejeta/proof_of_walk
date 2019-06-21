@@ -1,0 +1,2 @@
+def main(private field time, field current_time, field time_threshold) -> (field):
+	return if time_threshold + time > current_time then 1 else 0 fi

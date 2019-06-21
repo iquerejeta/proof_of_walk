@@ -1,0 +1,13 @@
+def main(private field a, private field b, private field c, private field d, private field[2] R, private field S, field[2] A) -> (field):
+  // a is the location
+	// b is the timestamp
+	
+	h = sha256packed([a, b, c, d])
+
+	field [128] M1 = unpack(h[0])
+	field [128] M2 = unpack(h[1])
+	field [256] concat = [...M1,...M2]
+	field [256] trailing = [0; 256]
+	context = ec_params()
+
+	return if verify_sig(R, S, A, concat, trailing, context) == 1 then 1 else 0 fi

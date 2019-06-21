@@ -1,0 +1,8 @@
+def main(field d, private field a, private field b) -> (field):
+    field[128] va = unpack(a)
+    field[128] vb = unpack(b)
+    field cd = 0
+    for field i in 0..127 do
+      cd = cd + if va[i] == vb[i] then 0 else 1 fi 
+    endfor
+    return if cd < d then 1 else 0 fi

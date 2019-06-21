@@ -1,20 +1,12 @@
 // Copyright 2019
 // Antonio Nappa - Iñigo Querejeta Azurmendi 
 
-import "./hash_verification.code"
+import "./powha_range.code"
+import "./functions/closeness.code" as closeness
 
 // This script will be used to proof the third proof of movement. This will make a normal proof of movement of the new 
 // locations, and then it will proof knowledge of openings of two existing proofs. Finally it will prove that the points used
 // in the three different proofs are smaller than a given range.
-
-def closeness(field d, private field a, private field b) -> (field):
-    field[128] va = unpack(a)
-    field[128] vb = unpack(b)
-    field cd = 0
-    for field i in 0..127 do
-      cd = cd + if va[i] == vb[i] then 0 else 1 fi 
-    endfor
-    return if cd < d then 1 else 0 fi
 
 // proof of walk
 def main(field hash_proof_1, field hash_proof_2, private field loc_one, private field timestamp_1, private field loc_two, private field timestamp_2, private field[2] R_1, private field S_1, private field[2] R_2, private field S_2, field[2] A, field location_distance, field time_distance, field current_time, field max_distance_paths, private field loc_one_first_proof, private field timestamp_1_first_proof, private field loc_two_first_proof, private field timestamp_2_first_proof, private field loc_one_second_proof, private field timestamp_1_second_proof, private field loc_two_second_proof, private field timestamp_2_second_proof) -> (field):
