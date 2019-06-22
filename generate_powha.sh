@@ -1,6 +1,6 @@
 #!/bin/sh
 
-python3.7 /Users/inigoquerejeta/Documents/zokrates/hackathon/proof_of_walk/signature_generator/generate_proof_data.py -p "signature_generator/input_data/" -fn "first_try" -gh 2189963759073207093083509 4379927518137661037313142 4379927518137661037313142 547490939765545336952944 547490939765545336952944 273745469882637314117173 -mind 30 -maxd 500 -maxtc 40 -maxtw 1000 -st 0
+python3 signature_generator/generate_proof_data.py -p "signature_generator/input_data/" -fn "first_try" -gh 2189963759073207093083509 4379927518137661037313142 4379927518137661037313142 547490939765545336952944 547490939765545336952944 273745469882637314117173 -mind 30 -maxd 500 -maxtc 40 -maxtw 1000 -st 0
 
 zokrates compile -i powha_range.code 
 cat signature_generator/input_data/first_try_walk_one | zokrates compute-witness

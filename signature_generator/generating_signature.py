@@ -9,7 +9,6 @@ import time
 from zokrates.eddsa import PrivateKey, PublicKey
 from zokrates.field import FQ
 
-from petlib.bn import Bn
 # from zokrates.utils import write_signature_for_zokrates_cli
 
 
@@ -87,7 +86,7 @@ def telecom_signature(coordinates, write_sig_zokrates=False):
         path = './zokrates_args'
         write_signature_for_zokrates_cli(pk, sig, path, coordinates)
 
-    hash_pair = Bn.from_hex(msg_bytes_short[:16].hex()), Bn.from_hex(msg_bytes_short[16:].hex())
+    hash_pair = int(msg_bytes_short[:16].hex(), base=16), int(msg_bytes_short[16:].hex(), base=16)
 
     return pk, sig, msg_bytes, timestamp, hash_pair
 

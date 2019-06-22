@@ -27,3 +27,6 @@ pip install -r requirements.txt
 End-to-end example
 
 ./generate_powha.sh
+
+#generate hashes for geodata
+the generator script works with Python2, there is a problem with geohash library in Python3 (https://github.com/vinsci/geohash/issues/4)
